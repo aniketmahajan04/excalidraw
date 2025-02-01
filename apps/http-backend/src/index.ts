@@ -51,7 +51,7 @@ app.post("/signin", async (req, res) => {
         });
         return;
     }
-    const user = await prismaClient.user.findUnique({
+    const user = await prismaClient.user.findFirst({
         where: {
             email: parseData.data.email,
             password: parseData.data.password
@@ -64,12 +64,35 @@ app.post("/signin", async (req, res) => {
         token: token
     })
 });
-app.post("/room", middleware,(req, res) => {
+app.post("/room", middleware,async (req, res) => {
+    try {
 
+        const parseData = CreateRoomSchema.safeParse(req.body);
+        if(!parseData.success){
+            res.json({
+                msg: "Incorrect format",
+                data: parseData.error
+            });
+            return;
+        }
+        //@ts-ignore
+        const userId = req.userId;
 
-    res.json({
-        roomId: "020"
-    })
+        const room = await prismaClient.room.create({
+            data: {
+                slug: parseData.data.name,
+                adminId: userId
+            }
+        })
+        
+        res.status(200).json({
+            roomId: room.id
+        })
+    } catch(error) {
+        res.status(500).json({
+            msg: "Internal sever error"
+        })
+    }
 });
 
 app.listen(3001);
