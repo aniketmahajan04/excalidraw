@@ -42,27 +42,41 @@ app.post("/signup", async (req, res) => {
 
 });
 app.post("/signin", async (req, res) => {
+    try {
 
-    const parseData = SignInUserSchema.safeParse(req.body);
-    if(!parseData.success){
-        res.json({
-            msg: "Incorrect format",
-            data: parseData.error
-        });
-        return;
-    }
+        const parseData = SignInUserSchema.safeParse(req.body);
+        if(!parseData.success){
+            res.json({
+                msg: "Incorrect format",
+                data: parseData.error
+            });
+            return;
+        }
     const user = await prismaClient.user.findFirst({
         where: {
             email: parseData.data.email,
             password: parseData.data.password
         }
     })
+    if(!user){
+        res.status(404).json({
+            msg: "User not found"
+        });
+        return;
+    }
+
     const token = jwt.sign({
-        userId: user?.id
+        userId: user.id
     }, JWT_SECRET)
     res.json({
         token: token
     })
+    } catch(error){
+        console.error(error);
+        res.status(500).json({
+            msg: "Interanal server error"
+        });
+    }
 });
 app.post("/room", middleware,async (req, res) => {
     try {
