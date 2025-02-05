@@ -1,5 +1,6 @@
 "use client"
 
+import { Fullscreen } from "lucide-react";
 import { Rye } from "next/font/google";
 import { startTransition, useEffect, useRef } from "react";
 
@@ -28,7 +29,10 @@ export default function Canvas() {
                     const width = e.clientX - startX;
                     const height = e.clientY - startY;
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.strokeRect(startX, startY, width, height)
+                    ctx.fillStyle = "rgbs(0, 0, 0)";
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.strokeStyle = "rgba(255, 255, 255)";
+                    ctx.strokeRect(startX, startY, width, height);
                 }
             })
 
@@ -39,11 +43,8 @@ export default function Canvas() {
         }
     }, [])
 
-    
-
-    
 
     return <div>
-        <canvas ref={canvasRef} width={500} height={500}></canvas>
+        <canvas ref={canvasRef} width={window.innerWidth} height={window.innerHeight}></canvas>
     </div>
 }
