@@ -24,16 +24,13 @@ export function ChatRoomClient({
             }));
 
             socket.onmessage = (event) => {
-                const pasrsedData = JSON.parse(event.data);
-                if(pasrsedData.type === "chat") {
-                    setChats(c => [...c, {message: pasrsedData.message} ])
+                const parsedData = JSON.parse(event.data);
+                if(parsedData.type === "chat") {
+                    setChats(c => [...(c || []),{message: parsedData.message}])
                 }
             }
         }
 
-        return () => {
-            socket?.close();
-        }
     }, [socket, loading, id])
 
     return <div>
